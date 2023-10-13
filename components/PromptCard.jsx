@@ -1,21 +1,30 @@
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
 
 const PromptCard = ({ post, handleEdit, handleDelete, handleTagClick }) => {
   const [copied, setCopied] = useState('');
   const { data: session } = useSession();
   const pathname = usePathname();
+  const router = useRouter();
   const handleCopy = () => {
     setCopied(post.prompt);
     navigator.clipboard.writeText(post.prompt);
     setTimeout(() => setCopied(false), 3000);
   };
+
+  const handleProfileClick = () => {
+    if (session?.user.id === post.creator._id) router.push('/profile');
+    router.push(`/profile/${post.creator._id}?name=${post.creator.username}`);
+  };
   return (
     <div className='prompt_card'>
       <div className='flex flex-col gap-4 justify-start items-start'>
-        <div className='flex items-start justify-between gap-4'>
+        <div
+          className='flex items-start justify-between gap-4'
+          onClick={handleProfileClick}
+        >
           <div className='flex justify-start items-center gap-4 cursor-pointer'>
             <Image
               src={post.creator.image}
